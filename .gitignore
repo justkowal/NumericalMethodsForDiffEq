@@ -1,0 +1,23 @@
+# Python environments
+.venv/
+venv/
+env/
+*.venv
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Manim & Presentation outputs
+media/
+slides/
+partial_movie_files/
+*.mp4
+*.tex
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
