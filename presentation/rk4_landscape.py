@@ -115,7 +115,7 @@ class RK4_Error_Landscape(Slide, MovingCameraScene):
         self.play(Indicate(kutta_pt), Write(kutta_sublabel))
         self.next_slide()
         
-        self.play(FadeOut(kutta_sublabel),Indicate(ralston_pt), Write(ralston_sublabel))
+        self.play(FadeOut(kutta_sublabel), Indicate(ralston_pt), Write(ralston_sublabel))
         self.next_slide()
         
         # more landmarks

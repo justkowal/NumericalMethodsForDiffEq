@@ -219,8 +219,7 @@ class RK4Derivation(Slide):
         self.play(FadeIn(choice_group))
         self.next_slide()
         
-        choice_group = VGroup(choice_text, choice_c2, choice_c3).arrange(DOWN).move_to(ORIGIN).shift(UP*0.5)
-        self.play(FadeIn(choice_group))
+
         self.next_slide()
         
         collapse_text = Text("Yields the famous weights:", font_size=32, color=TEAL).next_to(choice_group, DOWN, buff=0.5)

@@ -37,7 +37,7 @@ class ApplicationExample(Slide):
         self.play(FadeOut(params), FadeOut(funcs))
         
         graph_title_1 = Tex("Comparison: Analytical vs Forward Euler", font_size=32, color=YELLOW)
-        graph_title_2 = Tex("vs Backward Euler vs RK4 ($h=3.0$)", font_size=32, color=YELLOW)
+        graph_title_2 = Tex("vs Backward Euler vs RK4 ($h=5.0$)", font_size=32, color=YELLOW)
         graph_title = VGroup(graph_title_1, graph_title_2).arrange(DOWN)
         graph_title.next_to(title, DOWN, buff=0.2)
         self.play(Write(graph_title))

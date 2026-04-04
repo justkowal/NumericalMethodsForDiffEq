@@ -143,10 +143,10 @@ class ProblemDemonstration(Slide):
         flare_label = MathTex(r"M_e", r" = ", r"-\frac{\mathrm{d}M(t)}{\mathrm{d}t}\mathrm{d}t", color=ORANGE, font_size=24)
         
         # combine
-        everyting_but_flare = VGroup(tip, body, fin_left, fin_right, engine)
+        everything_but_flare = VGroup(tip, body, fin_left, fin_right, engine)
         
         # Combine everything into one manageable 'rocket' object
-        rocket = VGroup(everyting_but_flare, flare)
+        rocket = VGroup(everything_but_flare, flare)
         
         # layout
         LEFT_COLUMN_CENTER = LEFT * 3.5 + DOWN * 0.5 
