@@ -6,12 +6,13 @@ mkdir -p obj build
 echo "Compiling ARM..."
 arm-none-eabi-gcc -c startup/startup_arm.c -o obj/startup_arm.o -mcpu=cortex-m4 -mthumb -O3
 arm-none-eabi-gcc -c src/rk4.c -o obj/rk4_arm.o -mcpu=cortex-m4 -mthumb -O3 -Iinclude
+arm-none-eabi-gcc -c src/mini_rtt.c -o obj/mini_rtt.o -mcpu=cortex-m4 -mthumb -O3 -Iinclude
 arm-none-eabi-gcc -c examples/rocket_nrf52840.c -o obj/rocket_nrf52840_arm.o -mcpu=cortex-m4 -mthumb -O3 -Iinclude
 arm-none-eabi-gcc -c examples/rocket_stm32_fast.c -o obj/rocket_stm32_fast_arm.o -mcpu=cortex-m4 -mthumb -O3 -Iinclude
 arm-none-eabi-gcc -c examples/rocket_stm32_slow.c -o obj/rocket_stm32_slow_arm.o -mcpu=cortex-m4 -mthumb -O3 -Iinclude
 
 echo "Linking ARM..."
-arm-none-eabi-gcc obj/startup_arm.o obj/rocket_nrf52840_arm.o obj/rk4_arm.o -o build/rocket_nrf52840.elf -T linker/linker_nrf52840.ld -mcpu=cortex-m4 -mthumb -nostdlib -lgcc -Xlinker --gc-sections
+arm-none-eabi-gcc obj/startup_arm.o obj/rocket_nrf52840_arm.o obj/rk4_arm.o obj/mini_rtt.o -o build/rocket_nrf52840.elf -T linker/linker_nrf52840.ld -mcpu=cortex-m4 -mthumb -nostdlib -lgcc -Xlinker --gc-sections
 arm-none-eabi-objcopy -O binary build/rocket_nrf52840.elf build/nrf52840.bin
 
 arm-none-eabi-gcc obj/startup_arm.o obj/rocket_stm32_fast_arm.o obj/rk4_arm.o -o build/rocket_stm32_fast.elf -T linker/linker_stm32.ld -mcpu=cortex-m4 -mthumb -nostdlib -lgcc -Xlinker --gc-sections
