@@ -1,12 +1,12 @@
 from manim import *
 from manim_slides import Slide
+from theme import *
 
 class ProblemDemonstration(Slide):
     def construct(self):
         
         # text elements
-        header_1 = Text("Problem: Rocket Trajectory", font_size=24)
-        header_1.to_corner(UL)
+        header_1 = create_header("Problem: Rocket Trajectory")
         
         # placeholder labels
         equation_label = Text(
@@ -101,6 +101,10 @@ class ProblemDemonstration(Slide):
 
         eq_block_2 = VGroup(eq2_header, formula5, eq2_header_2, formula_6)
         eq_block_2.arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        
+        eq_block_1.scale_to_fit_height(min(eq_block_1.height, config.frame_height - 2.5))
+        eq_block_2.scale_to_fit_height(min(eq_block_2.height, config.frame_height - 2.5))
+        
         eq_block_2.align_to(eq_block_1, LEFT)
         eq_block_2.align_to(eq_block_1, UP)
 
@@ -276,7 +280,7 @@ class ProblemDemonstration(Slide):
         
         # rocket & equations
         self.play(
-            Write(everyting_but_flare),
+            Write(everything_but_flare),
             Write(basic_group, lag_ratio=0.5) # Lag the formula slightly after the label
         )
         
@@ -499,7 +503,7 @@ class ProblemDemonstration(Slide):
         final_eq.next_to(header_1, DOWN, aligned_edge=LEFT, buff=1.0)
         
         fade_out_group = VGroup(
-            everyting_but_flare, flare, flare_label,
+            everything_but_flare, flare, flare_label,
             velocity_vector, v_label, exhaust_velocity_vector, v_e_label, v_e_label_wrt_rocket,
             eq2_header, formula5[0], formula5[1], eq2_header_2,
             formula_6[0], formula_6[1], derivative_term, formula_6[5],
@@ -749,3 +753,9 @@ class ProblemDemonstration(Slide):
         final_label = Tex("Final differential equation of velocity", font_size=24, color=YELLOW)
         final_label.next_to(box, DOWN, buff=0.3)
         self.play(Create(box), FadeIn(final_label, shift=UP*0.1))
+
+        self.next_slide()
+        
+        transition_text = Tex("Before solving this complex ODE, let's look at numerical methods on a simpler test equation.", font_size=24, color=GRAY)
+        transition_text.to_edge(DOWN)
+        self.play(FadeIn(transition_text))

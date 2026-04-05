@@ -18,6 +18,16 @@ partial_movie_files/
 *.tex
 *.log
 
+# C/C++ Build artifacts
+implementation/obj/
+implementation/bin/
+implementation/lib/
+implementation/build/
+*.o
+*.a
+*.so
+*.out
+
 # OS generated files
 .DS_Store
 Thumbs.db

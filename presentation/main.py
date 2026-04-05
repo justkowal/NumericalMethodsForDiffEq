@@ -42,11 +42,11 @@ class NumericalMethodsPresentation(Slide):
         self.next_slide()
         do_wipe()
         
-        # application example
-        ApplicationExample.construct(self)
+        # rk4 landscape
+        RK4_Error_Landscape.construct(self)
 
         self.next_slide()
         do_wipe()
         
-        # rk4 landscape
-        RK4_Error_Landscape.construct(self)
+        # application example
+        ApplicationExample.construct(self)

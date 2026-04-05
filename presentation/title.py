@@ -1,5 +1,6 @@
 from manim import *
 from manim_slides import Slide
+from theme import *
 
 class TitleCard(Slide):
     def construct(self):
@@ -12,11 +13,11 @@ class TitleCard(Slide):
         
         subtitle = Text(
             "Comparison of Euler and Runge-Kutta Methods\nin theoretical cases and practical applications", 
-            font_size=36, 
-            color=BLUE,
+            font_size=TEXT_SIZE_SUB, 
+            color=COLORS["forward_euler"],
         )
         
-        author = Text("Jakub Kowal, 2026", font_size=24, color=GRAY)
+        author = Text("Jakub Kowal, 2026", font_size=TEXT_SIZE_SUB, color=GRAY)
         
         titles_group = VGroup(title, subtitle).arrange(DOWN, buff=0.8)
         titles_group.move_to(ORIGIN) 

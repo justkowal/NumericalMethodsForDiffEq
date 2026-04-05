@@ -1,12 +1,12 @@
 from manim import *
 from manim_slides import Slide
 import numpy as np
+from theme import *
 
 class RungeKutta4(Slide):
     def construct(self):
         
-        header = Text("Runge-Kutta 4th Order (RK4)", font_size=24)
-        header.to_corner(UL)
+        header = create_header("Runge-Kutta 4th Order (RK4)")
         
         self.play(Write(header))
         self.next_slide()
@@ -14,10 +14,10 @@ class RungeKutta4(Slide):
         axes = Axes(
             x_range=[0, 6.5, 1],
             y_range=[0, 6.5, 1],
-            x_length=8,
+            x_length=8.5,
             y_length=5,
             axis_config={"include_numbers": True},
-        ).shift(DOWN * 0.5 + LEFT * 1)
+        ).shift(DOWN * 0.5)
         
         axes_labels = axes.get_axis_labels(x_label="t", y_label="y(t)")
         self.play(Create(axes), Write(axes_labels))
@@ -28,16 +28,15 @@ class RungeKutta4(Slide):
         def deriv(t, y):
             return np.cos(t) + 0.5
             
-        true_curve = axes.plot(exact_sol, x_range=[0, 5.5], color=BLUE)
-        curve_label = MathTex("y(t)", color=BLUE).next_to(true_curve.get_end(), UP)
+        true_curve = axes.plot(exact_sol, x_range=[0, 5.5], color=COLORS["exact_solution"])
         
         t0 = 0
         y0 = exact_sol(t0)
-        start_dot = Dot(axes.c2p(t0, y0), color=YELLOW)
-        start_label = MathTex("(t_0, y_0)", font_size=24, color=YELLOW).next_to(start_dot, UL, buff=0.1)
+        start_dot = Dot(axes.c2p(t0, y0), color=COLORS["highlight"])
+        start_label = MathTex("(t_0, y_0)", font_size=24, color=COLORS["highlight"]).next_to(start_dot, UL, buff=0.1)
         
         self.play(FadeIn(start_dot), Write(start_label))
-        self.play(Create(true_curve), FadeIn(curve_label))
+        self.play(Create(true_curve))
         self.next_slide()
 
         ode_text = MathTex(r"\frac{\mathrm{d} y}{\mathrm{d} t} = f(t,y) = \cos(t) + 0.5", font_size=28)
@@ -61,6 +60,7 @@ class RungeKutta4(Slide):
         
         formulas = VGroup(rk4_formula_1, rk4_formula_2, rk4_formula_3, rk4_formula_4, rk4_formula_5)
         formulas.arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+        formulas.scale_to_fit_height(min(formulas.height, 3.5))
         formulas.next_to(ode_text, DOWN, buff=0.5).align_to(ode_text, RIGHT)
         
         self.play(Write(formulas))
@@ -88,8 +88,8 @@ class RungeKutta4(Slide):
             y_next = y_current + dt/6 * (k1 + 2*k2 + 2*k3 + k4)
             t_next = t_current + dt
             
-            next_dot = Dot(axes.c2p(t_next, y_next), color=GREEN)
-            rk4_segment = Line(axes.c2p(t_current, y_current), axes.c2p(t_next, y_next), color=GREEN)
+            next_dot = Dot(axes.c2p(t_next, y_next), color=COLORS["rk4"])
+            rk4_segment = Line(axes.c2p(t_current, y_current), axes.c2p(t_next, y_next), color=COLORS["rk4"])
             
             p0_pt = np.array([t_current, y_current, 0])
             p1_pt = np.array([t_current + dt/2, y_current + k1 * dt/2, 0])
@@ -108,18 +108,18 @@ class RungeKutta4(Slide):
             v4_start = p3_pt
             v4_end = p3_pt + np.array([dt, k4 * dt, 0])
             
-            vec1 = Arrow(axes.c2p(*v1_start)[:3], axes.c2p(*v1_end)[:3], color=ORANGE, buff=0, max_tip_length_to_length_ratio=0.15)
-            vec2 = Arrow(axes.c2p(*v2_start)[:3], axes.c2p(*v2_end)[:3], color=TEAL, buff=0, max_tip_length_to_length_ratio=0.15)
-            vec3 = Arrow(axes.c2p(*v3_start)[:3], axes.c2p(*v3_end)[:3], color=PURPLE, buff=0, max_tip_length_to_length_ratio=0.15)
-            vec4 = Arrow(axes.c2p(*v4_start)[:3], axes.c2p(*v4_end)[:3], color=MAROON, buff=0, max_tip_length_to_length_ratio=0.15)
+            vec1 = Arrow(axes.c2p(*v1_start)[:3], axes.c2p(*v1_end)[:3], color=COLORS["k1"], buff=0, max_tip_length_to_length_ratio=0.15)
+            vec2 = Arrow(axes.c2p(*v2_start)[:3], axes.c2p(*v2_end)[:3], color=COLORS["k2"], buff=0, max_tip_length_to_length_ratio=0.15)
+            vec3 = Arrow(axes.c2p(*v3_start)[:3], axes.c2p(*v3_end)[:3], color=COLORS["k3"], buff=0, max_tip_length_to_length_ratio=0.15)
+            vec4 = Arrow(axes.c2p(*v4_start)[:3], axes.c2p(*v4_end)[:3], color=COLORS["k4"], buff=0, max_tip_length_to_length_ratio=0.15)
             
-            dot1 = Dot(axes.c2p(*p1_pt), color=ORANGE, radius=0.06)
-            dot2 = Dot(axes.c2p(*p2_pt), color=TEAL, radius=0.06)
-            dot3 = Dot(axes.c2p(*p3_pt), color=PURPLE, radius=0.06)
+            dot1 = Dot(axes.c2p(*p1_pt), color=COLORS["k1"], radius=0.06)
+            dot2 = Dot(axes.c2p(*p2_pt), color=COLORS["k2"], radius=0.06)
+            dot3 = Dot(axes.c2p(*p3_pt), color=COLORS["k3"], radius=0.06)
             
-            guide1 = DashedLine(axes.c2p(*p0_pt), axes.c2p(*p1_pt), color=ORANGE, stroke_opacity=0.7)
-            guide2 = DashedLine(axes.c2p(*p0_pt), axes.c2p(*p2_pt), color=TEAL, stroke_opacity=0.7)
-            guide3 = DashedLine(axes.c2p(*p0_pt), axes.c2p(*p3_pt), color=PURPLE, stroke_opacity=0.7)
+            guide1 = DashedLine(axes.c2p(*p0_pt), axes.c2p(*p1_pt), color=COLORS["k1"], stroke_opacity=0.7)
+            guide2 = DashedLine(axes.c2p(*p0_pt), axes.c2p(*p2_pt), color=COLORS["k2"], stroke_opacity=0.7)
+            guide3 = DashedLine(axes.c2p(*p0_pt), axes.c2p(*p3_pt), color=COLORS["k3"], stroke_opacity=0.7)
             
             vert1 = DashedLine(axes.c2p(*p1_pt), axes.c2p(t_current + dt/2, 0), color=ORANGE, stroke_opacity=0.5)
             vert2 = DashedLine(axes.c2p(*p2_pt), axes.c2p(t_current + dt/2, 0), color=TEAL, stroke_opacity=0.5)
@@ -138,39 +138,39 @@ class RungeKutta4(Slide):
             w4_start = w3_end
             w4_end = w4_start + np.array([dt/6, k4 * dt/6, 0])
             
-            w_vec1 = Arrow(axes.c2p(*w1_start)[:3], axes.c2p(*w1_end)[:3], color=ORANGE, buff=0, max_tip_length_to_length_ratio=0.25)
-            w_vec2 = Arrow(axes.c2p(*w2_start)[:3], axes.c2p(*w2_end)[:3], color=TEAL, buff=0, max_tip_length_to_length_ratio=0.25)
-            w_vec3 = Arrow(axes.c2p(*w3_start)[:3], axes.c2p(*w3_end)[:3], color=PURPLE, buff=0, max_tip_length_to_length_ratio=0.25)
-            w_vec4 = Arrow(axes.c2p(*w4_start)[:3], axes.c2p(*w4_end)[:3], color=MAROON, buff=0, max_tip_length_to_length_ratio=0.25)
+            w_vec1 = Arrow(axes.c2p(*w1_start)[:3], axes.c2p(*w1_end)[:3], color=COLORS["k1"], buff=0, max_tip_length_to_length_ratio=0.25)
+            w_vec2 = Arrow(axes.c2p(*w2_start)[:3], axes.c2p(*w2_end)[:3], color=COLORS["k2"], buff=0, max_tip_length_to_length_ratio=0.25)
+            w_vec3 = Arrow(axes.c2p(*w3_start)[:3], axes.c2p(*w3_end)[:3], color=COLORS["k3"], buff=0, max_tip_length_to_length_ratio=0.25)
+            w_vec4 = Arrow(axes.c2p(*w4_start)[:3], axes.c2p(*w4_end)[:3], color=COLORS["k4"], buff=0, max_tip_length_to_length_ratio=0.25)
             
             if is_slow:
-                self.play(Indicate(current_dot, color=YELLOW, scale_factor=1.5))
+                self.play(Indicate(current_dot, color=COLORS["highlight"], scale_factor=1.5))
                 
                 # k1
-                self.play(Indicate(rk4_formula_1, color=YELLOW))
+                self.play(Indicate(rk4_formula_1, color=COLORS["highlight"]))
                 self.play(Create(vec1))
                 self.next_slide()
                 
                 # k2
-                self.play(Indicate(rk4_formula_2, color=YELLOW))
+                self.play(Indicate(rk4_formula_2, color=COLORS["highlight"]))
                 self.play(Create(guide1), FadeIn(dot1), Create(vert1))
                 self.play(Create(vec2))
                 self.next_slide()
                 
                 # k3
-                self.play(Indicate(rk4_formula_3, color=YELLOW))
+                self.play(Indicate(rk4_formula_3, color=COLORS["highlight"]))
                 self.play(Create(guide2), FadeIn(dot2), Create(vert2))
                 self.play(Create(vec3))
                 self.next_slide()
                 
                 # k4
-                self.play(Indicate(rk4_formula_4, color=YELLOW))
+                self.play(Indicate(rk4_formula_4, color=COLORS["highlight"]))
                 self.play(Create(guide3), FadeIn(dot3), Create(vert3))
                 self.play(Create(vec4))
                 self.next_slide()
                 
                 # weighted sum
-                self.play(Indicate(rk4_formula_5, color=GREEN))
+                self.play(Indicate(rk4_formula_5, color=COLORS["rk4"]))
                 self.play(
                     ReplacementTransform(vec1, w_vec1),
                     ReplacementTransform(vec2, w_vec2),
@@ -188,19 +188,19 @@ class RungeKutta4(Slide):
                 self.next_slide()
             else:
                 fast_rt = 0.2
-                self.play(Indicate(rk4_formula_1, color=YELLOW, run_time=fast_rt))
+                self.play(Indicate(rk4_formula_1, color=COLORS["highlight"], run_time=fast_rt))
                 self.play(Create(vec1), run_time=fast_rt)
                 
-                self.play(Indicate(rk4_formula_2, color=YELLOW, run_time=fast_rt))
+                self.play(Indicate(rk4_formula_2, color=COLORS["highlight"], run_time=fast_rt))
                 self.play(Create(guide1), FadeIn(dot1), Create(vert1), Create(vec2), run_time=fast_rt)
                 
-                self.play(Indicate(rk4_formula_3, color=YELLOW, run_time=fast_rt))
+                self.play(Indicate(rk4_formula_3, color=COLORS["highlight"], run_time=fast_rt))
                 self.play(Create(guide2), FadeIn(dot2), Create(vert2), Create(vec3), run_time=fast_rt)
                 
-                self.play(Indicate(rk4_formula_4, color=YELLOW, run_time=fast_rt))
+                self.play(Indicate(rk4_formula_4, color=COLORS["highlight"], run_time=fast_rt))
                 self.play(Create(guide3), FadeIn(dot3), Create(vert3), Create(vec4), run_time=fast_rt)
                 
-                self.play(Indicate(rk4_formula_5, color=GREEN, run_time=fast_rt))
+                self.play(Indicate(rk4_formula_5, color=COLORS["rk4"], run_time=fast_rt))
                 self.play(
                     ReplacementTransform(vec1, w_vec1),
                     ReplacementTransform(vec2, w_vec2),
@@ -223,7 +223,7 @@ class RungeKutta4(Slide):
             
         self.next_slide()
         
-        accuracy_title = Text("High Precision of RK4", font_size=20, color=GREEN)
+        accuracy_title = Text("High Precision of RK4", font_size=20, color=COLORS["rk4"])
         accuracy_text = Text("The approximation very closely\nfollows the analytical solution", font_size=16)
         
         accuracy_group = VGroup(accuracy_title, accuracy_text).arrange(DOWN, aligned_edge=RIGHT)
@@ -239,7 +239,7 @@ class RungeKutta4(Slide):
         
         area_polygon = Polygon(
             *true_curve_points, *reversed(rk4_points),
-            fill_color=GREEN,
+            fill_color=COLORS["rk4"],
             fill_opacity=0.8,
             stroke_width=0
         )
@@ -251,7 +251,7 @@ class RungeKutta4(Slide):
         self.next_slide()
 
         elements_to_fade = VGroup(
-            header, axes, axes_labels, true_curve, curve_label,
+            header, axes, axes_labels, true_curve,
             start_dot, start_label, rk4_mobjects, ode_text
         )
         
@@ -263,14 +263,14 @@ class RungeKutta4(Slide):
         
         # highlight weights
         self.play(
-            rk4_formula_5[1].animate.set_color(YELLOW),
-            rk4_formula_5[3].animate.set_color(YELLOW),
-            rk4_formula_5[5].animate.set_color(YELLOW),
+            rk4_formula_5[1].animate.set_color(COLORS["highlight"]),
+            rk4_formula_5[3].animate.set_color(COLORS["highlight"]),
+            rk4_formula_5[5].animate.set_color(COLORS["highlight"]),
             run_time=1.5
         )
         self.next_slide()
         
-        question = Text("Why we use these weights?", font_size=32, color=YELLOW)
+        question = Text("Why we use these weights?", font_size=32, color=COLORS["highlight"])
         question.next_to(formulas, DOWN, buff=0.8)
         self.play(Write(question))
         self.next_slide()

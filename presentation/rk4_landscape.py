@@ -1,10 +1,11 @@
 from manim import *
 from manim_slides import Slide
+from theme import *
 
 class RK4_Error_Landscape(Slide, MovingCameraScene):
     def construct(self):
         # title
-        title = Text("Mapping the Landscape (log10 Error)", font_size=36).to_edge(UP)
+        title = create_header("Mapping the Landscape (log10 Error)")
         
         self.play(Write(title))
         self.next_slide()
@@ -69,26 +70,26 @@ class RK4_Error_Landscape(Slide, MovingCameraScene):
             return (4*x - 3) / (6*x - 4)
 
         # within bounds
-        left_branch = axes.plot(hyperbola_func, x_range=[0, 0.5], color=RED)
-        right_branch = axes.plot(hyperbola_func, x_range=[0.75, 1.0], color=RED)
+        left_branch = axes.plot(hyperbola_func, x_range=[0, 0.5], color=COLORS["backward_euler"])
+        right_branch = axes.plot(hyperbola_func, x_range=[0.75, 1.0], color=COLORS["backward_euler"])
         rk3_curve = VGroup(left_branch, right_branch)
 
         # label branch
-        rk3_label = Text("RK3 residuals", font_size=15, color=RED).next_to(right_branch, UP, buff=0.1)
+        rk3_label = Text("RK3 residuals", font_size=15, color=COLORS["backward_euler"]).next_to(right_branch, UP, buff=0.1)
         rk3_group = VGroup(rk3_curve, rk3_label)
 
-        std_pt = Dot(axes.c2p(0.5, 0.5), color=BLUE, radius=0.1)
-        std_label = Text("Classic RK4", font_size=20, color=BLUE).next_to(std_pt, UP, buff=0.1)
+        std_pt = Dot(axes.c2p(0.5, 0.5), color=COLORS["forward_euler"], radius=0.1)
+        std_label = Text("Classic RK4", font_size=20, color=COLORS["forward_euler"]).next_to(std_pt, UP, buff=0.1)
         
         # kutta's method
-        kutta_pt = Dot(axes.c2p(1/3, 2/3), color=GREEN, radius=0.08)
-        kutta_label = Text("Kutta 3/8", font_size=15, color=GREEN).next_to(kutta_pt, UP, buff=0.1)
-        kutta_sublabel = Text("Minimized error for the average ODE case.", font_size=12, color=GREEN, stroke_width=0.2, stroke_color=WHITE).next_to(kutta_pt, DOWN, buff=0.05)
+        kutta_pt = Dot(axes.c2p(1/3, 2/3), color=COLORS["rk4"], radius=0.08)
+        kutta_label = Text("Kutta 3/8", font_size=15, color=COLORS["rk4"]).next_to(kutta_pt, UP, buff=0.1)
+        kutta_sublabel = Text("Minimized error for the average ODE case.", font_size=12, color=COLORS["rk4"], stroke_width=0.2, stroke_color=WHITE).next_to(kutta_pt, DOWN, buff=0.05)
         
         # ralston's
-        ralston_pt = Dot(axes.c2p(0.4, 0.45), color=ORANGE, radius=0.08)
-        ralston_label = Text("Ralston's", font_size=15, color=ORANGE).next_to(ralston_pt, LEFT, buff=0.1)
-        ralston_sublabel = Text("Best for solving edge-case ODEs.", font_size=12, color=ORANGE, stroke_width=0.2, stroke_color=WHITE).next_to(ralston_pt, DOWN, buff=0.05)
+        ralston_pt = Dot(axes.c2p(0.4, 0.45), color=COLORS["k1"], radius=0.08)
+        ralston_label = Text("Ralston's", font_size=15, color=COLORS["k1"]).next_to(ralston_pt, LEFT, buff=0.1)
+        ralston_sublabel = Text("Best for solving edge-case ODEs.", font_size=12, color=COLORS["k1"], stroke_width=0.2, stroke_color=WHITE).next_to(ralston_pt, DOWN, buff=0.05)
 
         # show heatmap
         self.play(Create(axes), Write(labels))

@@ -1,183 +1,195 @@
 from manim import *
 from manim_slides import Slide
+from theme import *
 import numpy as np
 
 class ApplicationExample(Slide):
     def construct(self):
         # 1. Headline
-        title = Title("Application to Hobby Rocket")
+        title = create_header("Application to Hobby Rocket")
         self.play(Write(title))
+        
+        transition_text = Tex("Applying the methods to our initial rocket physics problem.", font_size=24, color=GRAY)
+        transition_text.to_edge(DOWN)
+        self.play(FadeIn(transition_text))
+        
         self.next_slide()
+        self.play(FadeOut(transition_text))
 
-        # parameters
-        eq1 = MathTex(r"M_{dry} = 1.0 \text{ kg}", font_size=36)
-        eq2 = MathTex(r"M_{fuel_0} = 0.9 \text{ kg}", font_size=36)
-        eq3 = MathTex(r"q = 0.3 \text{ kg/s}", font_size=36)
-        eq4 = MathTex(r"t_{burn} = \frac{0.9}{0.3} = 3.0 \text{ s}", font_size=36)
-        eq5 = MathTex(r"v_e = 300 \text{ m/s}", font_size=36)
+        # Problem Setup - Cleaner Layout
+        col1 = VGroup(
+            MathTex(r"M_{dry} = 1.0 \text{ kg}", font_size=28),
+            MathTex(r"M_{fuel_0} = 0.9 \text{ kg}", font_size=28),
+            MathTex(r"q = 0.3 \text{ kg/s}", font_size=28),
+            MathTex(r"t_{burn} = 3.0 \text{ s}", font_size=28),
+            MathTex(r"v_e = 300 \text{ m/s}", font_size=28)
+        ).arrange(DOWN, aligned_edge=LEFT)
         
-        params = VGroup(eq1, eq2, eq3, eq4, eq5).arrange(DOWN, aligned_edge=LEFT)
-        params.to_corner(UL).shift(DOWN * 1.5)
+        col2 = VGroup(
+            MathTex(r"M(t) = 1.0 + 0.9 \left(1 - \frac{t}{3}\right)^2", font_size=28),
+            MathTex(r"M'(t) = -0.6 \left(1 - \frac{t}{3}\right)", font_size=28),
+            MathTex(r"a(t) = -\frac{M'(t)}{M(t)} v_e - g", font_size=28),
+            MathTex(r"g = 9.81 \text{ m/s}^2", font_size=28)
+        ).arrange(DOWN, aligned_edge=LEFT)
         
-        self.play(FadeIn(params))
-        self.next_slide()
+        setup_group = VGroup(col1, col2).arrange(RIGHT, buff=1.5).next_to(title, DOWN, buff=0.8)
         
-        # formulas
-        f1 = MathTex(r"M(t) = 1.0 + 0.9 \left(1 - \frac{t}{3}\right)^2", font_size=36)
-        f2 = MathTex(r"M'(t) = -0.6 \left(1 - \frac{t}{3}\right)", font_size=36)
-        f3 = MathTex(r"a(t) = -\frac{1}{M(t)} M'(t) v_e - g", font_size=36)
-        f4 = MathTex(r"g = 9.81 \text{ m/s}^2", font_size=36)
-        
-        funcs = VGroup(f1, f2, f3, f4).arrange(DOWN, aligned_edge=LEFT)
-        funcs.next_to(params, DOWN, buff=0.7)
-        self.play(Write(funcs))
+        self.play(Write(col1))
+        self.play(Write(col2))
         self.next_slide()
 
         # graph section
-        self.play(FadeOut(params), FadeOut(funcs))
+        self.play(FadeOut(setup_group))
         
-        graph_title_1 = Tex("Comparison: Analytical vs Forward Euler", font_size=32, color=YELLOW)
-        graph_title_2 = Tex("vs Backward Euler vs RK4 ($h=5.0$)", font_size=32, color=YELLOW)
-        graph_title = VGroup(graph_title_1, graph_title_2).arrange(DOWN)
+        graph_title = Tex("Comparison with $h=2.0\text{s}$", font_size=32, color=COLORS["highlight"])
         graph_title.next_to(title, DOWN, buff=0.2)
         self.play(Write(graph_title))
         
-        # flight up to 20 seconds, max speed around 155 m/s (162 - 3*9.81 = 133 roughly)
+        # Better axes bounds
         ax = Axes(
-            x_range=[0, 20, 2],
-            y_range=[0, 320, 40],
+            x_range=[0, 20.001, 2],
+            y_range=[-100, 300, 50],
             axis_config={"include_numbers": True},
-            x_length=9,
-            y_length=4.2
+            x_length=8.5,
+            y_length=4.5
         )
-        labels = ax.get_axis_labels(x_label="t (s)", y_label="v (m/s)")
         
-        graph_group = VGroup(ax, labels).next_to(graph_title, DOWN, buff=0.2)
+        labels = ax.get_axis_labels(x_label="t \text{ (s)}", y_label="v \text{ (m/s)}")
+        graph_group = VGroup(ax, labels)
         
+        # Position with nice margins from bottom and left
+        graph_group.to_edge(DOWN, buff=0.5).to_edge(LEFT, buff=1.5)
+        
+        self.play(Create(graph_group))
+        
+        # --- Analytical Solution ---
         def exact_m(t):
             if t > 3: return 1.0
             return 1.0 + 0.9 * (1 - t/3)**2
 
         def exact_v(t):
-            # v(t) = v_e * ln(M(0)/M(t)) - g*t
             return 300 * np.log(1.9 / exact_m(t)) - 9.81 * t
-            
+
         def f(t):
             if t >= 3: return -9.81
             num = 0.6 * (1 - t/3)
             den = 1.0 + 0.9 * (1 - t/3)**2
             return (num / den) * 300 - 9.81
             
-        analytical_graph = ax.plot(exact_v, x_range=[0, 18], color=WHITE)
-        analytical_label = MathTex("\text{Exact}", color=WHITE, font_size=28).next_to(ax.c2p(2, exact_v(2)), UP)
+        analytical_graph = ax.plot(exact_v, x_range=[0, 20], color=COLORS["exact_solution"], use_smoothing=True)
         
-        self.play(Create(graph_group))
-        self.play(Create(analytical_graph), Write(analytical_label))
+        # Legend
+        legend = VGroup(
+            VGroup(Line(color=COLORS["exact_solution"]).set_length(0.5), Tex("Exact", font_size=24)),
+            VGroup(Line(color=COLORS["forward_euler"]).set_length(0.5), Tex("Forward Euler", font_size=24)),
+            VGroup(Line(color=COLORS["backward_euler"]).set_length(0.5), Tex("Backward Euler", font_size=24)),
+            VGroup(Line(color=COLORS["rk4"]).set_length(0.5), Tex("RK4", font_size=24))
+        )
+        for row in legend:
+            row.arrange(RIGHT, buff=0.2)
+        legend.arrange(DOWN, aligned_edge=LEFT)
+        
+        max_right = legend.get_right()[0]
+        for row in legend:
+            ph = Tex("Err: +00000.0", font_size=24).set_opacity(0)
+            ph.next_to(row, RIGHT, buff=0)
+            ph.set_x(max_right + 0.4, direction=LEFT)
+            row.add(ph)
+            
+        legend_box = always_redraw(lambda: SurroundingRectangle(legend, color=GRAY, buff=0.2))
+        legend_group = VGroup(legend_box, legend).to_edge(RIGHT, buff=1.0).align_to(ax, UP)
+        
+        self.play(Create(analytical_graph))
+        # Fade in box AND first legend row
+        self.play(FadeIn(legend_box), FadeIn(legend[0]))
         self.next_slide()
 
-        # prepare arrays
-        h = 5.0
-        t_vals = np.arange(0, 24.0, h)
-        
-        # 1. Forward Euler Animation
-        legend_fe = Dot(color=BLUE)
-        legend_fe_text = Tex("Forward Euler", font_size=24).next_to(legend_fe, RIGHT)
-        legend_fe_group = VGroup(legend_fe, legend_fe_text)
-        legend_fe_group.move_to(ax.c2p(15, 280))
-        self.play(FadeIn(legend_fe_group))
-        
-        fe_pts = [0]
-        fe_dots = VGroup(Dot(ax.c2p(0, 0), color=BLUE))
-        self.play(FadeIn(fe_dots))
-        
-        fe_lines = VGroup()
-        for i in range(len(t_vals)-1):
-            t_curr = t_vals[i]
-            v_curr = fe_pts[-1]
-            slope = f(t_curr)
-            v_next = v_curr + h * slope
-            fe_pts.append(v_next)
-            
-            fe_lines.add(Line(ax.c2p(t_curr, v_curr), ax.c2p(t_curr + h, v_next), color=BLUE))
-            
-            if v_next < 0:
-                break
-        
-        self.play(Create(fe_lines), run_time=2)
-        self.next_slide()
+        def get_exact_area(t_end):
+            if t_end <= 0: return 0.0
+            t_fine = np.linspace(0, t_end, 1000)
+            v_fine = [exact_v(t) for t in t_fine]
+            return np.trapezoid(v_fine, t_fine)
 
-        # 2. Backward Euler Animation
-        legend_be = Dot(color=RED)
-        legend_be_text = Tex("Backward Euler", font_size=24).next_to(legend_be, RIGHT)
-        legend_be_group = VGroup(legend_be, legend_be_text).next_to(legend_fe_group, DOWN, aligned_edge=LEFT)
-        self.play(FadeIn(legend_be_group))
-        
-        be_pts = [0]
-        be_dots = VGroup(Dot(ax.c2p(0, 0), color=RED))
-        
-        be_lines = VGroup()
-        for i in range(len(t_vals)-1):
-            t_curr = t_vals[i]
-            v_curr = be_pts[-1]
-            t_next = t_curr + h
-            slope = f(t_next) 
-            v_next = v_curr + h * slope
-            be_pts.append(v_next)
-            
-            be_lines.add(Line(ax.c2p(t_curr, v_curr), ax.c2p(t_curr + h, v_next), color=RED))
-            
-            if v_next < 0:
-                break
-            
-        self.play(Create(be_lines), run_time=2)
-        self.next_slide()
-        
-        # 3. RK4 Animation
-        legend_rk = Dot(color=GREEN)
-        legend_rk_text = Tex("RK4", font_size=24).next_to(legend_rk, RIGHT)
-        legend_rk_group = VGroup(legend_rk, legend_rk_text).next_to(legend_be_group, DOWN, aligned_edge=LEFT)
-        self.play(FadeIn(legend_rk_group))
-        
-        rk_pts = [0]
-        rk_dots = VGroup(Dot(ax.c2p(0, 0), color=GREEN))
-        
-        rk_lines = VGroup()
-        # let's animate the first step with vectors as requested by the user previously but they also said "run all 4 vectors visible".
-        # Let's animate all vectors for RK4
-        
-        for i in range(len(t_vals)-1):
-            t_curr = t_vals[i]
-            v_curr = rk_pts[-1]
-            t_next = t_curr + h
-            
-            k1 = f(t_curr)
-            k2 = f(t_curr + h/2)
-            k3 = f(t_curr + h/2)
-            k4 = f(t_curr + h)
-            avg_slope = (k1 + 2*k2 + 2*k3 + k4) / 6
-            
-            v_next = v_curr + h * avg_slope
-            rk_pts.append(v_next)
-            
-            # Draw RK4 vectors
-            v1 = Arrow(ax.c2p(t_curr, v_curr), ax.c2p(t_curr + h, v_curr + h*k1), color=ORANGE, buff=0, max_tip_length_to_length_ratio=0.1)
-            v2 = Arrow(ax.c2p(t_curr + h/2, v_curr + (h/2)*k1), ax.c2p(t_curr + h, v_curr + (h/2)*k1 + (h/2)*k2), color=TEAL, buff=0, max_tip_length_to_length_ratio=0.1)
-            v3 = Arrow(ax.c2p(t_curr + h/2, v_curr + (h/2)*k2), ax.c2p(t_curr + h, v_curr + (h/2)*k2 + (h/2)*k3), color=PURPLE, buff=0, max_tip_length_to_length_ratio=0.1)
-            v4 = Arrow(ax.c2p(t_curr + h, v_curr + h*k3), ax.c2p(t_curr + h + h, v_curr + h*k3 + h*k4), color=MAROON, buff=0, max_tip_length_to_length_ratio=0.1)
-            
-            self.play(GrowArrow(v1), run_time=0.15)
-            self.play(GrowArrow(v2), run_time=0.15)
-            self.play(GrowArrow(v3), run_time=0.15)
-            self.play(GrowArrow(v4), run_time=0.15)
-            
-            final_v = Arrow(ax.c2p(t_curr, v_curr), ax.c2p(t_curr + h, v_next), color=GREEN, buff=0, max_tip_length_to_length_ratio=0.1)
-            self.play(ReplacementTransform(VGroup(v1, v2, v3, v4), final_v), run_time=0.2)
-            
-            seg = Line(ax.c2p(t_curr, v_curr), ax.c2p(t_curr + h, v_next), color=GREEN)
-            rk_lines.add(seg)
-            self.play(Create(seg), FadeOut(final_v), run_time=0.1)
+        # --- Numerical Solvers ---
+        h = 2.0
+        t_vals = np.arange(0, 22.0, h)
 
-            if v_next < 0:
-                break
+        def draw_method(color_key, method_func, legend_idx):
+            pts = [0.0]
+            lines = VGroup()
+            dots = VGroup(Dot(ax.c2p(0, 0), color=COLORS[color_key]))
+            
+            self.play(FadeIn(legend[legend_idx]), run_time=0.5)
+            
+            num_area = 0.0
+            t_end_sim = 0.0
+            t_history = [0.0]
+            
+            for i in range(len(t_vals)-1):
+                t_curr = t_vals[i]
+                v_curr = pts[-1]
+                v_next = method_func(t_curr, v_curr, h)
+                pts.append(v_next)
+                
+                step_area = (v_curr + v_next) / 2.0 * h
+                
+                if v_next < -100:
+                    if v_curr >= -100:
+                        lines.add(Line(ax.c2p(t_curr, v_curr), ax.c2p(t_curr+h, v_next), color=COLORS[color_key]))
+                        dots.add(Dot(ax.c2p(t_curr+h, v_next), color=COLORS[color_key]))
+                        num_area += step_area
+                        t_end_sim = t_curr + h
+                        t_history.append(t_end_sim)
+                    break
+                    
+                lines.add(Line(ax.c2p(t_curr, v_curr), ax.c2p(t_curr + h, v_next), color=COLORS[color_key]))
+                dots.add(Dot(ax.c2p(t_curr + h, v_next), color=COLORS[color_key]))
+                num_area += step_area
+                t_end_sim = t_curr + h
+                t_history.append(t_end_sim)
+            
+            self.play(Create(lines), FadeIn(dots), run_time=1.5)
+            
+            # --- Visual Area Shadow ---
+            num_points_c2p = [ax.c2p(t, v) for t, v in zip(t_history, pts)]
+            fine_t = np.linspace(t_history[-1], 0, 100)
+            exact_points_c2p = [ax.c2p(t, exact_v(t)) for t in fine_t]
+            
+            error_area = Polygon(
+                *num_points_c2p,
+                *exact_points_c2p,
+                fill_color=COLORS[color_key],
+                fill_opacity=0.3,
+                stroke_width=0
+            )
+            self.play(FadeIn(error_area))
+            
+            exact_area = get_exact_area(t_end_sim)
+            error_val = num_area - exact_area
+            
+            err_text = Tex(rf"Err: {error_val:+.1f}", font_size=24, color=COLORS[color_key])
+            err_text.move_to(legend[legend_idx][2], aligned_edge=LEFT)
+            self.play(Transform(legend[legend_idx][2], err_text))
+            
+            self.next_slide()
+            self.play(FadeOut(error_area))
 
-        self.next_slide()
+        # 1. Forward Euler Test
+        def fe_step(t, v, dt):
+            return v + dt * f(t)
+        draw_method("forward_euler", fe_step, 1)
+
+        # 2. Backward Euler Test
+        def be_step(t, v, dt):
+            return v + dt * f(t + dt)
+        draw_method("backward_euler", be_step, 2)
+        
+        # 3. RK4 Test
+        def rk4_step(t, v, dt):
+            k1 = f(t)
+            k2 = f(t + dt/2)
+            k3 = f(t + dt/2)
+            k4 = f(t + dt)
+            return v + dt * (k1 + 2*k2 + 2*k3 + k4) / 6
+        draw_method("rk4", rk4_step, 3)
+

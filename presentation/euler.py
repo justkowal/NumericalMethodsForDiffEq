@@ -1,22 +1,28 @@
 from manim import *
 from manim_slides import Slide
+from theme import *
 
 class EulerMethod(Slide):
     def construct(self):
         
-        header_1 = Text("Euler's Method", font_size=24)
-        header_1.to_corner(UL)
+        header_1 = create_header("Euler's Method")
         
         self.play(Write(header_1))
+        
+        transition_text = Tex("Let's isolate the concept on a simple 1D test equation first.", font_size=24, color=GRAY)
+        transition_text.to_edge(DOWN)
+        self.play(FadeIn(transition_text))
+        
         self.next_slide()
+        self.play(FadeOut(transition_text))
 
         axes = Axes(
             x_range=[0, 6.5, 1],
             y_range=[0, 6.5, 1],
-            x_length=8,
+            x_length=8.5,
             y_length=5,
             axis_config={"include_numbers": True},
-        ).shift(DOWN * 0.5 + LEFT * 1)
+        ).shift(DOWN * 0.5)
         
         axes_labels = axes.get_axis_labels(x_label="t", y_label="y(t)")
         self.play(Create(axes), Write(axes_labels))
@@ -25,18 +31,17 @@ class EulerMethod(Slide):
         def exact_sol(t):
             return np.sin(t) + 0.5 * t + 1
             
-        true_curve = axes.plot(exact_sol, x_range=[0, 5.5], color=BLUE)
-        curve_label = MathTex("y(t)", color=BLUE).next_to(true_curve.get_end(), UP)
+        true_curve = axes.plot(exact_sol, x_range=[0, 5.5], color=COLORS["exact_solution"])
         
         t0 = 0
         y0 = exact_sol(t0)
-        start_dot = Dot(axes.c2p(t0, y0), color=YELLOW)
-        start_label = MathTex("(t_0, y_0)", font_size=24, color=YELLOW).next_to(start_dot, UL, buff=0.1)
+        start_dot = Dot(axes.c2p(t0, y0), color=COLORS["highlight"])
+        start_label = MathTex("(t_0, y_0)", font_size=24, color=COLORS["highlight"]).next_to(start_dot, UL, buff=0.1)
         self.play(FadeIn(start_dot), Write(start_label))
         self.next_slide()
 
         # show true solution
-        self.play(Create(true_curve), FadeIn(curve_label))
+        self.play(Create(true_curve))
         self.next_slide()
 
         def deriv(t, y):
@@ -76,14 +81,14 @@ class EulerMethod(Slide):
             dt_tg = 1.0 # doubled 
             true_tg_start = axes.c2p(t_current - dt_tg, exact_sol(t_current) - slope * dt_tg)
             true_tg_end = axes.c2p(t_current + dt_tg, exact_sol(t_current) + slope * dt_tg)
-            tangent_line = Line(true_tg_start, true_tg_end, color=RED)
+            tangent_line = Line(true_tg_start, true_tg_end, color=COLORS["forward_euler"])
             
             self.play(Create(tangent_line), run_time=anim_run_time)
             if is_slow:
                 self.next_slide()
                 
             # indicate last point
-            self.play(Indicate(current_dot, color=YELLOW, scale_factor=1.5), run_time=anim_run_time)
+            self.play(Indicate(current_dot, color=COLORS["highlight"], scale_factor=1.5), run_time=anim_run_time)
             
             # move to point
             euler_pt = axes.c2p(t_current, y_current)
@@ -94,7 +99,7 @@ class EulerMethod(Slide):
             # dashed line
             orient_start = euler_pt
             orient_end = axes.c2p(t_current + dt * 1.2, y_current + slope * dt * 1.2)
-            dotted_tangent = DashedLine(orient_start, orient_end, color=RED)
+            dotted_tangent = DashedLine(orient_start, orient_end, color=COLORS["forward_euler"])
             
             self.play(ReplacementTransform(tangent_line, dotted_tangent), run_time=anim_run_time)
             if is_slow:
@@ -112,10 +117,10 @@ class EulerMethod(Slide):
                 self.next_slide()
                 
             # new point & segment
-            next_dot = Dot(axes.c2p(t_next, y_next), color=YELLOW)
+            next_dot = Dot(axes.c2p(t_next, y_next), color=COLORS["highlight"])
             self.play(FadeIn(next_dot), run_time=anim_run_time)
             
-            euler_segment = Line(axes.c2p(t_current, y_current), axes.c2p(t_next, y_next), color=YELLOW)
+            euler_segment = Line(axes.c2p(t_current, y_current), axes.c2p(t_next, y_next), color=COLORS["forward_euler"])
             self.play(Create(euler_segment), run_time=anim_run_time * (1.5 if is_slow else 1.0))
             if is_slow:
                 self.next_slide()
@@ -147,7 +152,7 @@ class EulerMethod(Slide):
         # closed polygon
         area_polygon = Polygon(
             *true_curve_points, *reversed(euler_points),
-            fill_color=RED,
+            fill_color=COLORS["backward_euler"],
             fill_opacity=0.3,
             stroke_width=0
         )
@@ -155,8 +160,8 @@ class EulerMethod(Slide):
         divergence_text = Text(
             "Approximation diverges significantly\nfrom analytical solution",
             font_size=20,
-            color=RED,
-            t2c={"diverges significantly": RED}
+            color=COLORS["backward_euler"],
+            t2c={"diverges significantly": COLORS["backward_euler"]}
         )
         divergence_text.next_to(area_polygon, DOWN, buff=0.1).shift(DOWN * 0.2 + RIGHT * 1.5)
 
@@ -169,7 +174,7 @@ class EulerMethod(Slide):
             run_time=0.5
         )
         
-        reason_title = Text("Why the Divergence?", font_size=20, color=YELLOW)
+        reason_title = Text("Why the Divergence?", font_size=20, color=COLORS["highlight"])
         reason_text_1 = Text("Euler assumes the rate of change", font_size=16)
         reason_text_2 = Text("is constant across the entire step.", font_size=16)
         
@@ -190,13 +195,13 @@ class EulerMethod(Slide):
             return Line(
                 axes.c2p(t_val - t_len, y_val - s * t_len),
                 axes.c2p(t_val + t_len, y_val + s * t_len),
-                color=ORANGE
+                color=COLORS["highlight"]
             )
             
         moving_tangent = always_redraw(get_tangent_line)
-        moving_dot = always_redraw(lambda: Dot(axes.c2p(tangent_tracker_pt.get_value(), exact_sol(tangent_tracker_pt.get_value())), color=ORANGE, radius=DEFAULT_DOT_RADIUS))
+        moving_dot = always_redraw(lambda: Dot(axes.c2p(tangent_tracker_pt.get_value(), exact_sol(tangent_tracker_pt.get_value())), color=COLORS["highlight"], radius=DEFAULT_DOT_RADIUS))
         
-        slope_label = MathTex(r"\text{True Slope changes!}", font_size=32, color=ORANGE)
+        slope_label = MathTex(r"\text{True Slope changes!}", font_size=32, color=COLORS["highlight"])
         slope_label.add_updater(lambda m: m.next_to(moving_tangent, RIGHT, buff=0.1))
         
         self.play(Create(moving_tangent), FadeIn(moving_dot), Write(slope_label))
@@ -217,8 +222,7 @@ class EulerMethod(Slide):
             run_time=0.5
         )
         
-        header_forward = Text("Forward Euler's Method", font_size=24)
-        header_forward.to_corner(UL)
+        header_forward = create_header("Forward Euler's Method")
         self.play(Transform(header_1, header_forward))
         self.next_slide()
 
@@ -229,8 +233,7 @@ class EulerMethod(Slide):
         )
         self.next_slide()
         
-        header_2 = Text("Backward Euler's Method", font_size=24)
-        header_2.to_corner(UL)
+        header_2 = create_header("Backward Euler's Method")
         
         self.play(Write(header_2))
         self.next_slide()
@@ -256,18 +259,18 @@ class EulerMethod(Slide):
             y_next = y_current + slope * dt
             
             eval_point = axes.c2p(t_next, exact_sol(t_next))
-            eval_dot = Dot(eval_point, color=PURPLE)
+            eval_dot = Dot(eval_point, color=COLORS["backward_euler"])
             
             eval_arrow = Arrow(
                 start=axes.c2p(t_current, 0),
                 end=axes.c2p(t_next, 0),
-                color=PURPLE,
+                color=COLORS["backward_euler"],
                 buff=0,
                 stroke_width=4,
                 max_tip_length_to_length_ratio=0.1
             )
-            eval_label = MathTex(r"t_{n+1}", font_size=24, color=PURPLE).next_to(eval_arrow, DOWN, buff=0.1)
-            eval_line = DashedLine(axes.c2p(t_next, 0), eval_point, color=PURPLE)
+            eval_label = MathTex(r"t_{n+1}", font_size=24, color=COLORS["backward_euler"]).next_to(eval_arrow, DOWN, buff=0.1)
+            eval_line = DashedLine(axes.c2p(t_next, 0), eval_point, color=COLORS["backward_euler"])
             
             if is_slow:
                 self.play(Create(eval_arrow), Write(eval_label), run_time=anim_run_time/2)
@@ -277,12 +280,12 @@ class EulerMethod(Slide):
             dt_tg = 1.0 
             true_tg_start = axes.c2p(t_next - dt_tg, exact_sol(t_next) - slope * dt_tg)
             true_tg_end = axes.c2p(t_next + dt_tg, exact_sol(t_next) + slope * dt_tg)
-            tangent_line = Line(true_tg_start, true_tg_end, color=PURPLE)
+            tangent_line = Line(true_tg_start, true_tg_end, color=COLORS["backward_euler"])
             self.play(Create(tangent_line), run_time=anim_run_time)
             if is_slow:
                 self.next_slide()
                 
-            self.play(Indicate(current_dot, color=YELLOW, scale_factor=1.5), run_time=anim_run_time)
+            self.play(Indicate(current_dot, color=COLORS["highlight"], scale_factor=1.5), run_time=anim_run_time)
             
             euler_pt = axes.c2p(t_current, y_current)
             if is_slow:
@@ -300,7 +303,7 @@ class EulerMethod(Slide):
                 
             orient_start = euler_pt
             orient_end = axes.c2p(t_current + dt * 1.2, y_current + slope * dt * 1.2)
-            dotted_tangent = DashedLine(orient_start, orient_end, color=PURPLE)
+            dotted_tangent = DashedLine(orient_start, orient_end, color=COLORS["backward_euler"])
             self.play(ReplacementTransform(tangent_line, dotted_tangent), run_time=anim_run_time)
             if is_slow:
                 self.next_slide()
@@ -314,10 +317,10 @@ class EulerMethod(Slide):
                 self.play(Create(dy_line), Write(dy_label), run_time=anim_run_time)
                 self.next_slide()
                 
-            next_dot = Dot(axes.c2p(t_next, y_next), color=PURPLE)
+            next_dot = Dot(axes.c2p(t_next, y_next), color=COLORS["backward_euler"])
             self.play(FadeIn(next_dot), run_time=anim_run_time)
             
-            euler_segment = Line(axes.c2p(t_current, y_current), axes.c2p(t_next, y_next), color=PURPLE)
+            euler_segment = Line(axes.c2p(t_current, y_current), axes.c2p(t_next, y_next), color=COLORS["backward_euler"])
             self.play(Create(euler_segment), run_time=anim_run_time * (1.5 if is_slow else 1.0))
             if is_slow:
                 self.next_slide()
@@ -342,7 +345,7 @@ class EulerMethod(Slide):
         
         area_polygon_backward = Polygon(
             *true_curve_points, *reversed(backward_points),
-            fill_color=PURPLE,
+            fill_color=COLORS["backward_euler"],
             fill_opacity=0.3,
             stroke_width=0
         )
@@ -350,8 +353,8 @@ class EulerMethod(Slide):
         divergence_text_backward = Text(
             "Better, but still not precise",
             font_size=20,
-            color=PURPLE,
-            t2c={"not precise": RED, "Better": GREEN}
+            color=COLORS["backward_euler"],
+            t2c={"not precise": COLORS["backward_euler"], "Better": COLORS["rk4"]}
         )
         divergence_text_backward.next_to(area_polygon_backward, DOWN, buff=0.1).shift(DOWN * 0.2 + RIGHT * 1.5)
 
