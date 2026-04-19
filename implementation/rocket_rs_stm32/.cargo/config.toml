@@ -1,0 +1,14 @@
+[build]
+target = "thumbv7em-none-eabihf"
+
+[target.thumbv7em-none-eabihf]
+runner = "probe-rs run --chip STM32G474RETx"
+rustflags = [
+  "-C", "link-arg=-Tlink.x",
+]
+
+[alias]
+fast_rk4 = "run --release --bin fast_rk4"
+slow_rk4 = "run --release --bin slow_rk4"
+fast_fwd_euler = "run --release --bin fast_fwd_euler"
+slow_fwd_euler = "run --release --bin slow_fwd_euler"
