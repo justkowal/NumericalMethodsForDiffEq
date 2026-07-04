@@ -84,12 +84,12 @@ class RK4_Error_Landscape(Slide, MovingCameraScene):
         # kutta's method
         kutta_pt = Dot(axes.c2p(1/3, 2/3), color=COLORS["rk4"], radius=0.08)
         kutta_label = Text("Kutta 3/8", font_size=15, color=COLORS["rk4"]).next_to(kutta_pt, UP, buff=0.1)
-        kutta_sublabel = Text("Minimized error for the average ODE case.", font_size=12, color=COLORS["rk4"], stroke_width=0.2, stroke_color=WHITE).next_to(kutta_pt, DOWN, buff=0.05)
+        kutta_sublabel = Text("Minimized error for highly smooth, predictable equations.", font_size=12, color=COLORS["rk4"], stroke_width=0.2, stroke_color=WHITE).next_to(kutta_pt, DOWN, buff=0.05)
         
         # ralston's
         ralston_pt = Dot(axes.c2p(0.4, 0.45), color=COLORS["k1"], radius=0.08)
         ralston_label = Text("Ralston's", font_size=15, color=COLORS["k1"]).next_to(ralston_pt, LEFT, buff=0.1)
-        ralston_sublabel = Text("Best for solving edge-case ODEs.", font_size=12, color=COLORS["k1"], stroke_width=0.2, stroke_color=WHITE).next_to(ralston_pt, DOWN, buff=0.05)
+        ralston_sublabel = Text("Minimizes the formula's worst-case errors.", font_size=12, color=COLORS["k1"], stroke_width=0.2, stroke_color=WHITE).next_to(ralston_pt, DOWN, buff=0.05)
 
         # show heatmap
         self.play(Create(axes), Write(labels))

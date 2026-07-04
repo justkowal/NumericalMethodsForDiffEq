@@ -269,8 +269,3 @@ class RungeKutta4(Slide):
             run_time=1.5
         )
         self.next_slide()
-        
-        question = Text("Why we use these weights?", font_size=32, color=COLORS["highlight"])
-        question.next_to(formulas, DOWN, buff=0.8)
-        self.play(Write(question))
-        self.next_slide()

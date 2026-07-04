@@ -757,5 +757,5 @@ class ProblemDemonstration(Slide):
         self.next_slide()
         
         transition_text = Tex("Before solving this complex ODE, let's look at numerical methods on a simpler test equation.", font_size=24, color=GRAY)
-        transition_text.to_edge(DOWN)
+        transition_text.next_to(final_label, DOWN, buff=0.25).align_to(box, LEFT)
         self.play(FadeIn(transition_text))

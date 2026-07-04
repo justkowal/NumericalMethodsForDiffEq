@@ -4,6 +4,8 @@ from theme import *
 
 class TitleCard(Slide):
     def construct(self):
+        self.next_slide()
+        
         title = Text(
             "Numerical Methods\nfor solving differential equations", 
             font_size=56, 

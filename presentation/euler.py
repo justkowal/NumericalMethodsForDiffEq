@@ -163,7 +163,7 @@ class EulerMethod(Slide):
             color=COLORS["backward_euler"],
             t2c={"diverges significantly": COLORS["backward_euler"]}
         )
-        divergence_text.next_to(area_polygon, DOWN, buff=0.1).shift(DOWN * 0.2 + RIGHT * 1.5)
+        divergence_text.next_to(area_polygon, DOWN, buff=0.1).shift(RIGHT * 1.5)
 
         self.play(FadeIn(area_polygon), Write(divergence_text))
         self.next_slide()

@@ -150,7 +150,7 @@ class RK4Derivation(Slide):
         col2 = VGroup(Text("Third Order", font_size=20, color=COLORS["k2"]), eq3, eq4, Text("Consistency", font_size=20, color=COLORS["k2"]), eq9, eq10, eq11).arrange(DOWN, buff=0.2)
         col3 = VGroup(Text("Fourth Order", font_size=20, color=COLORS["k2"]), eq5, eq6, eq7, eq8).arrange(DOWN, buff=0.2)
         
-        cond_group = VGroup(col1, col2, col3).arrange(RIGHT, buff=0.8).next_to(title, DOWN, buff=0.5)
+        cond_group = VGroup(col1, col2, col3).arrange(RIGHT, buff=0.8).next_to(title, DOWN, buff=0.5).set_x(0)
         cond_group.scale_to_fit_height(min(cond_group.height, config.frame_height - 3.0))
         
         self.play(FadeIn(col1, shift=UP*0.5), run_time=0.5)
@@ -158,16 +158,16 @@ class RK4Derivation(Slide):
         self.play(FadeIn(col3, shift=UP*0.5), run_time=0.5)
         self.next_slide()
         
-        math_prob = Text("11 Equations, but 13 Unknowns.", font_size=32, color=COLORS["backward_euler"]).to_edge(DOWN)
-        self.play(Write(math_prob))
+        math_prob = Text("11 Equations, but 13 Unknowns.", font_size=32, color=COLORS["backward_euler"]).to_edge(DOWN).shift(UP*0.5)
+        constants = MathTex("a_{21}, a_{31}, a_{32}, a_{41}, a_{42}, a_{43}, b_1, b_2, b_3, b_4, c_2, c_3, c_4").scale(0.7).next_to(math_prob, DOWN, buff=0.3)
+        self.play(Write(math_prob), FadeIn(constants))
         self.next_slide()
         
-        self.play(FadeOut(cond_group), FadeOut(math_prob))
+        self.play(FadeOut(cond_group), FadeOut(math_prob), FadeOut(constants))
         
         title5 = create_header("Underdetermined System = Infinite Solutions")
-        degree_text = Text("(Degrees of Freedom)", font_size=32).next_to(title5, DOWN)
         
-        self.play(Transform(title, title5), FadeIn(degree_text))
+        self.play(Transform(title, title5))
         self.next_slide()
         
         choice_text = Text("The Classic Choice:", font_size=32, color=COLORS["highlight"])
@@ -192,7 +192,7 @@ class RK4Derivation(Slide):
         self.play(FadeIn(arrow), FadeIn(weights_col))
         self.next_slide()
         
-        self.play(FadeOut(horiz_group), FadeOut(degree_text))
+        self.play(FadeOut(horiz_group))
         
         title6 = create_header("The Classic RK4 Method")
         self.play(Transform(title, title6))
